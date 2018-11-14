@@ -8,10 +8,38 @@
 /* run this program using the console pauser or add your own getch, system("pause") or input loop */
 
 int main(int argc, char *argv[]) {
+	int number, uwin, cwin;
 	
+	initialize();			//빙고판 초기화
 	
+	do{
+		printf("--<사용자 빙고판>--\n");
+		print_bingo(ubingo);  		//사용자 빙고판 출력 
+		
+		number = get_number_byMe(0); //사용자의 번호 선택 
+		
+		filled_bingo(ubingo, number);
+		filled_bingo(cbingo, number);
+		
+		number = get_number_byCom(1);	//컴퓨터의 번호 선택
+		filled_bingo(ubingo, number);
+		filled_bingo(cbingo, number);
+		
+		uwin = count_bingo(ubingo);		// 빙고 완성 확인 
+		cwin = count_bingo(cbingo); 
+	} 
 	
-	return 0;
+	while((uwin == 0) && (cwin ==0));	//1이 되면 승자가 생기니까 이대로 진행 
+	
+	print("--<사용자 결과-->\n");
+	print_bingo(ubingo);			//사용자의 빙고판 출력 
+	print("--<컴퓨터 결과>--\n");
+	print_bingo(cbingo);			//컴퓨터의 빙고판 출력 
+	
+	print_winner(cwin*2 + uwin);
+	// 사용자가 이기면(uwin=1), case=1
+	// 컴퓨터가 이기면(cwin=1), case=2
+	// 비기면(uwin=cwin=1), case=3 , 그 이외는 에러 
 }
 
 void initialize(){   			// 빙고판 초기화 함수 
@@ -93,6 +121,63 @@ void filled_bingo(int arr[N][N], int number){ //입력받은 number과 같은 수를 -1로
 	
 }
 
+void count_bingo(int arr[N][N]){			// 빙고 테이블이 채운 가로/세로/대각선 줄 수를 계산해서 반환 
+	int x, y, sum;							// 한 줄의 합이 -1*N이 되면 빙고 이므로 sum 변수 선언
+	int count = 0;								// 가로 세로 대각선 줄이 만들어진 갯수 
+		
+	for(y=0; y<N; y++;){			//x축 확인 
+		sum = 0;				//각 줄 마다 구해야하므로 sum 초기화 
+		for(x=0; x<N; x++){
+			sum += arr[y][x];
+		}
+		if(sum == -1*N){
+			count = count + 1;
+			return count;
+		}
+	
+	} 
+	
+	for(x=0; x<N; x++){					//y축 확인 
+		sum=0;							//sum 초기화
+		for(y=0; y<N; y++){
+			sum += arr[y][x];	
+		} 
+		if(sum == -1*N){
+			count = count +1;
+			return count;
+		}
+	}
+	
+	sum = 0;						// 대각선은 한줄뿐이므로 for구문 밖에서 sum초기화
+	for(x=0; x<N; x++){				// 대각선 확인 
+		sum += arr[x][x];
+	} 
+	if(sum == -1*N){
+		count = count +1;
+		return count;
+	}
+	
+	sum =0;
+	for(x=0; x<N; x++){				// 대각선 확인 
+		sum+= arr[x][N -x-1];
+	}
+	if(sum == -1*N){
+		count = count +1;
+		return count;
+	}
+	
+	if(count >= M){			        //count된 숫자가 M값과 같은지 확인 
+		return 1;						// count_bingo =1 이되면 승자	
+	}
+	
+	else(){
+		return 0;					// count_bingo=0 이되면 아직 승자가 없으므로 main함수에서 do_while문을 못 벗어남. 
+	}
+	
+	
+}
+
+
 void print_winner(int winner){ // 승자를 출력하는 함수
 	switch(winner){
 		case 1:							//uwin =1 일때(사용자가 이긴경우) 
@@ -110,4 +195,3 @@ void print_winner(int winner){ // 승자를 출력하는 함수
 	} 
 }
 
-void 
