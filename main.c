@@ -13,7 +13,7 @@ void filled_bingo(int arr[N][N], int number);
 int count_bingo(int arr[N][N]);
 void print_winner(int winner);
 
-int count =0;							//=전역변수들 
+int count = 0;							//=전역변수들 
 int checked[N*N];
 
 int ubingo[N][N];					//사용자의 빙고판 = 전역변수	 
@@ -42,7 +42,6 @@ void main() {
 		uwin = count_bingo(ubingo);		// 빙고 완성 확인 
 		cwin = count_bingo(cbingo); 
 	} 
-	
 	while((uwin == 0) && (cwin ==0));	//1이 되면 승자가 생기니까 이대로 진행 
 	
 	print("--<사용자 결과-->\n");
@@ -70,7 +69,7 @@ void set_rand(int*array){    		//빙고판 만드는 함수
 		array[i] = i+1;
 	}
 	for(i=0; i<N*N; i++){
-		swap(&array[i], &array[rand() %25]);
+		swap(&array[i], &array[rand() %N*N]);
 	}
 	
 }
@@ -89,7 +88,7 @@ void print_bingo(int arr[N][N]){ 	// 빙고판 출력하는 함수
 	for(y=0; y<N; y++){
 		for(x=0; x<N; x++){
 			if(arr[y][x] != -1){			//거의 대부분 그냥 출력 
-				printf("%7d", arr[y][x]);
+				printf("%d", arr[y][x]);
 			}
 			else{							//에러가 발생한 경우 
 				printf("ERROR");
@@ -110,17 +109,17 @@ int get_number(int frm){ 			// 빙고 번호 입력 선택
 			printf(">> 1~25 사이의 숫자를 입력하세요: __");
 			scanf("%d", number);
 			if(number<1 || number>25){		//retry=1이면 입력에러 다시입력해야함. 
-				retry =1;
+				retry = 1;
 			}
 		}
 		else{
-			number= rand() %25 +1;
+			number= rand() %N*N +1;
 		}
 		
 		if(retry==0){
 			for(x=0; x<N; x++){
 				if(checked[x] == number){
-					retry =1;
+					retry = 1;
 					break;
 				}
 			}
@@ -156,16 +155,17 @@ void filled_bingo(int arr[N][N], int number){ //입력받은 number과 같은 수를 -1로
 
 int count_bingo(int arr[N][N]){			// 빙고 테이블이 채운 가로/세로/대각선 줄 수를 계산해서 반환 
 	int x, y, sum;							// 한 줄의 합이 -1*N이 되면 빙고 이므로 sum 변수 선언
-	int count = 0;								// 가로 세로 대각선 줄이 만들어진 갯수 
+	int try_count = 0;								// 가로 세로 대각선 줄이 만들어진 갯수 
 		
 	for(y=0; y<N; y++){			//x축 확인 
 		sum = 0;				//각 줄 마다 구해야하므로 sum 초기화 
 		for(x=0; x<N; x++){
 			sum += arr[y][x];
+			try_count = try_count + 1;
 		}
 		if(sum == -1*N){
-			count = count + 1;
-			return count;
+			printf("총 시도횟수는 %d 입니다.", try_count);
+			return try_count;
 		}
 	
 	} 
@@ -174,29 +174,33 @@ int count_bingo(int arr[N][N]){			// 빙고 테이블이 채운 가로/세로/대각선 줄 수를
 		sum=0;							//sum 초기화
 		for(y=0; y<N; y++){
 			sum += arr[y][x];	
+			try_count = try_count +1;
 		} 
 		if(sum == -1*N){
-			count = count +1;
-			return count;
+			printf("총 시도횟수는 %d 입니다.", try_count);
+			return try_count;
+			
 		}
 	}
 	
 	sum = 0;						// 대각선은 한줄뿐이므로 for구문 밖에서 sum초기화
 	for(x=0; x<N; x++){				// 대각선 확인 
 		sum += arr[x][x];
+		try_count = try_count +1;
 	} 
 	if(sum == -1*N){
-		count = count +1;
-		return count;
+		printf("총 시도횟수는 %d 입니다.", try_count);
+		return try_count;
 	}
 	
 	sum =0;
 	for(x=0; x<N; x++){				// 대각선 확인 
 		sum+= arr[x][N -x-1];
+		try_count = try_count +1;
 	}
 	if(sum == -1*N){
-		count = count +1;
-		return count;
+		printf("총 시도횟수는 %d 입니다.", try_count);
+		return try_count;
 	}
 	
 	if(count >= M){			        //count된 숫자가 M값과 같은지 확인 
