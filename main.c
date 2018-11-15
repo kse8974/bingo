@@ -4,10 +4,24 @@
 #define N 5            // 빙고 크기 N은 기호상수로 조절 가능 
 #define M 3           // 빙고에서 이기는 조건 M은 기호 상수로 조절 가능 
 
+void initialize();
+void set_rand(int*array);
+void swap(int*x, int*y);
+void print_bingo(int arr[N][N]);
+int get_number(int frm);				// 0:USER 1:COM 
+void filled_bingo(int arr[N][N], int number);
+int count_bingo(int arr[N][N]);
+void print_winner(int winner);
+
+int count =0;							//=전역변수들 
+int checked[N*N];
+
+int ubingo[N][N];					//사용자의 빙고판 = 전역변수	 
+int cbingo[N][N];					//컴퓨터의 빙고판 
 
 /* run this program using the console pauser or add your own getch, system("pause") or input loop */
 
-int main(int argc, char *argv[]) {
+void main() {
 	int number, uwin, cwin;
 	
 	initialize();			//빙고판 초기화
@@ -16,12 +30,12 @@ int main(int argc, char *argv[]) {
 		printf("--<사용자 빙고판>--\n");
 		print_bingo(ubingo);  		//사용자 빙고판 출력 
 		
-		number = get_number_byMe(0); //사용자의 번호 선택 
+		number = get_number(0); //사용자의 번호 선택 
 		
 		filled_bingo(ubingo, number);
 		filled_bingo(cbingo, number);
 		
-		number = get_number_byCom(1);	//컴퓨터의 번호 선택
+		number = get_number(1);	//컴퓨터의 번호 선택
 		filled_bingo(ubingo, number);
 		filled_bingo(cbingo, number);
 		
@@ -86,27 +100,46 @@ void print_bingo(int arr[N][N]){ 	// 빙고판 출력하는 함수
 	} 
 }
 
-void get_number_byMe(int frm){ 			// 내가 빙고 번호 입력 선택 
+int get_number(int frm){ 			// 빙고 번호 입력 선택 
 	int number;
 	int x, retry;
 	
 	do{
-		retry=0;
-		if(frm ==0) {							// 0: 나 1: 컴퓨터 
+		retry = 0;
+		if(frm == 0) {							// 0: 나 1: 컴퓨터 
 			printf(">> 1~25 사이의 숫자를 입력하세요: __");
 			scanf("%d", number);
 			if(number<1 || number>25){		//retry=1이면 입력에러 다시입력해야함. 
 				retry =1;
 			}
 		}
+		else{
+			number= rand() %25 +1;
+		}
+		
+		if(retry==0){
+			for(x=0; x<N; x++){
+				if(checked[x] == number){
+					retry =1;
+					break;
+				}
+			}
+		}
 	}
+	while(retry ==1);				// retry=1 이면 다시 입력해야하므로 do구문으로 돌아감.
+		
+	checked[count++] = number;
 	
+	if(frm ==0){
+		printf("> 사용자가  '%d'를 선택했습니다. \n", number);
+	}
+	else {
+		printf("> 컴퓨터가 '%d'를 선택했습니다.\n \n", number);
+	}	
+	return number;
 }
 
-void get_number_byCom(){			// 컴퓨터가 임의로 빙고 번호 선택 
-	
-	
-}
+
 
 void filled_bingo(int arr[N][N], int number){ //입력받은 number과 같은 수를 -1로 만드는 함수(색칠된 부분) 
 	int x, y;
@@ -121,11 +154,11 @@ void filled_bingo(int arr[N][N], int number){ //입력받은 number과 같은 수를 -1로
 	
 }
 
-void count_bingo(int arr[N][N]){			// 빙고 테이블이 채운 가로/세로/대각선 줄 수를 계산해서 반환 
+int count_bingo(int arr[N][N]){			// 빙고 테이블이 채운 가로/세로/대각선 줄 수를 계산해서 반환 
 	int x, y, sum;							// 한 줄의 합이 -1*N이 되면 빙고 이므로 sum 변수 선언
 	int count = 0;								// 가로 세로 대각선 줄이 만들어진 갯수 
 		
-	for(y=0; y<N; y++;){			//x축 확인 
+	for(y=0; y<N; y++){			//x축 확인 
 		sum = 0;				//각 줄 마다 구해야하므로 sum 초기화 
 		for(x=0; x<N; x++){
 			sum += arr[y][x];
@@ -170,7 +203,7 @@ void count_bingo(int arr[N][N]){			// 빙고 테이블이 채운 가로/세로/대각선 줄 수�
 		return 1;						// count_bingo =1 이되면 승자	
 	}
 	
-	else(){
+	else{
 		return 0;					// count_bingo=0 이되면 아직 승자가 없으므로 main함수에서 do_while문을 못 벗어남. 
 	}
 	
